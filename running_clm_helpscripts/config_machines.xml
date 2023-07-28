@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+
+<!--
+
+ ===============================================================
+ COMPILER and COMPILERS
+ ===============================================================
+ If a machine supports multiple compilers - then
+  - the settings for COMPILERS should reflect the supported compilers
+    as a comma separated string
+  - the setting for COMPILER should be the default compiler
+    (which is one of the values in COMPILERS)
+
+ ===============================================================
+ MPILIB and MPILIBS
+ ===============================================================
+ If a machine supports only one MPILIB is supported - then
+ the setting for  MPILIB and MPILIBS should be blank ("")
+ If a machine supports multiple mpi libraries (e.g. mpich and openmpi)
+  - the settings for MPILIBS should reflect the supported mpi libraries
+    as a comma separated string
+
+ The default settings for COMPILERS and MPILIBS is blank (in config_machines.xml)
+
+ Normally variable substitutions are not made until the case scripts are run, however variables
+ of the form $ENV{VARIABLE_NAME} are substituted in create_newcase from the environment
+ variable of the same name if it exists.
+
+ ===============================================================
+ PROJECT_REQUIRED
+ ===============================================================
+ A machine may need the PROJECT xml variable to be defined either because it is
+ used in some paths, or because it is used to give an account number in the job
+ submission script. If either of these are the case, then PROJECT_REQUIRED
+ should be set to TRUE for the given machine.
+
+
+ mpirun: the mpirun command that will be used to actually launch the model.
+ The attributes used to choose the mpirun command are:
+
+ mpilib: can either be 'default' the name of an mpi library, or a compiler name so one can choose the mpirun
+	 based on the mpi library in use.
+
+   the 'executable' tag must have arguments required for the chosen mpirun, as well as the executable name.
+
+ unit_testing: can be 'true' or 'false'.
+   This allows using a different mpirun command to launch unit tests
+
+-->
+
+<config_machines version="2.0">
+
+  <machine MACH="pizdaint">
+    <DESC>CSCS Cray XC40/XC50, os is CLE based on SUSE SLES, 12 pes/node, batch system is SLURM</DESC>
+    <OS>CNL</OS>
+    <COMPILERS>cray,intel,nvhpc,nvhpc-oasis,gnu,gnu-oasis</COMPILERS>
+    <MPILIBS>mpich</MPILIBS>
+    <CIME_OUTPUT_ROOT>/scratch/snx3000/$USER</CIME_OUTPUT_ROOT>
+    <DIN_LOC_ROOT>$ENV{CESMDATAROOT}/cesm_inputdata</DIN_LOC_ROOT>
+    <DIN_LOC_ROOT_CLMFORC>$ENV{CESMDATAROOT}/cesm_inputdata/atm/datm7</DIN_LOC_ROOT_CLMFORC>
+    <DOUT_S_ROOT>$ENV{CESMOUTPUTROOT}</DOUT_S_ROOT>
+    <BASELINE_ROOT>$ENV{CESMDATAROOT}/ccsm_baselines</BASELINE_ROOT>
+    <CCSM_CPRNC>$ENV{CESMDATAROOT}/cesm_tools/ccsm_cprnc/cprnc</CCSM_CPRNC>
+    <GMAKE_J>12</GMAKE_J>
+    <BATCH_SYSTEM>slurm</BATCH_SYSTEM>
+    <SUPPORTED_BY>petra.sieber-at-env.ethz.ch</SUPPORTED_BY>
+    <MAX_TASKS_PER_NODE>12</MAX_TASKS_PER_NODE>
+    <MAX_MPITASKS_PER_NODE>12</MAX_MPITASKS_PER_NODE>
+    <PROJECT_REQUIRED>TRUE</PROJECT_REQUIRED>
+    <mpirun mpilib="default">
+      <executable>srun</executable>
+      <arguments>
+        <arg name="num_tasks"> -n {{ total_tasks }}</arg>
+        <arg name="thread_count"> -d $ENV{OMP_NUM_THREADS}</arg>
+        <arg name="labelstdout">-prepend-rank</arg>
+        <arg name="cpubind">--cpu_bind=rank</arg>
+        <arg name="nohyperthread">--hint=nomultithread</arg>
+        <arg name="craypat">pat_run</arg>
+      </arguments>
+    </mpirun>
+    <module_system type="module">
+      <init_path lang="perl">/opt/modules/default/init/perl.pm</init_path>
+      <init_path lang="python">/opt/modules/default/init/python.py</init_path>
+      <init_path lang="sh">/opt/modules/default/init/sh</init_path>
+      <init_path lang="csh">/opt/modules/default/init/csh</init_path>
+      <cmd_path lang="perl">/opt/modules/default/bin/modulecmd perl</cmd_path>
+      <cmd_path lang="python">/opt/modules/default/bin/modulecmd python</cmd_path>
+      <cmd_path lang="sh">module</cmd_path>
+      <cmd_path lang="csh">module</cmd_path>
+      <modules>
+        <command name="rm">PrgEnv-intel</command>
+        <command name="rm">PrgEnv-cray</command>
+        <command name="rm">PrgEnv-gnu</command>
+        <command name="rm">PrgEnv-pgi</command>
+        <command name="rm">PrgEnv-nvidia</command>
+        <command name="load">daint-gpu</command>
+        <command name="load">cray-mpich</command>
+      </modules>
+
+      <modules compiler="gnu">
+        <command name="load">PrgEnv-gnu</command>
+        <command name="switch">gcc gcc/9.3.0</command>
+      </modules>
+
+      <modules compiler="gnu-oasis">
+        <command name="load">PrgEnv-gnu</command>
+        <command name="switch">gcc gcc/9.3.0</command>
+      </modules>
+
+      <modules compiler="intel">
+        <command name="load">PrgEnv-intel</command>
+      </modules>
+
+      <modules compiler="cray">
+        <command name="load">PrgEnv-cray</command>
+      </modules>
+
+      <modules compiler="nvhpc">
+        <command name="load">PrgEnv-nvidia</command>
+        <command name="load">nvhpc/21.3</command>
+      </modules>
+
+      <modules compiler="nvhpc-oasis">
+        <command name="load">PrgEnv-nvidia</command>
+        <command name="load">nvhpc/21.3</command>
+      </modules>
+
+      <modules>
+        <command name="load">cray-netcdf-hdf5parallel</command>
+        <command name="load">cray-hdf5-parallel</command>
+        <command name="load">cray-parallel-netcdf</command>     
+      </modules>        
+        
+    </module_system>
+    <environment_variables>
+      <env name="OMP_STACKSIZE">64M</env>
+    </environment_variables>
+    <environment_variables comp_interface="nuopc">
+	    <env name="ESMFMKFILE">$ENV{ESMF_PATH}/lib/esmf.mk</env>
+    </environment_variables>
+    <environment_variables>
+	    <env name="PIO">/project/s1207/ivanderk/spack-install/cray-cnl7-haswell/gcc-9.3.0/parallelio-2.5.10-syh3yqqrmal6pvuahzx2ia55azg5ncms/</env>
+    </environment_variables>
+  </machine>
+
+</config_machines>
