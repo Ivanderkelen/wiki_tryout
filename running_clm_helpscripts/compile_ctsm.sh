@@ -20,7 +20,7 @@ date=`date +'%Y%m%d-%H%M'` # get current date and time
 startdate=`date +'%Y-%m-%d %H:%M:%S'`
 
 COMPSET=I2000Clm51Sp # I2000Clm50SpGs for release-clm5.0 
-RES=f09_g17 #hcru_hcru_mt13 #f09_g17 for test glob
+RES=hcru_hcru_mt13 #f09_g17 for test glob
 DOMAIN=glob # eur for CCLM2 (EURO-CORDEX), sa for South-America, glob for global 
 
 CODE=CTSMdev # clm5.0 for official release, CTSMdev for latest master branch (requires ESMF installation)
@@ -34,7 +34,7 @@ CASENAME=$CODE.$COMPILER.$COMPSET.$RES.$DOMAIN.$EXP
 DRIVER=nuopc # mct for clm5.0, mct or nuopc for CTSMdev, using nuopc requires ESMF installation (at least 8.4.1)
 MACH=pizdaint
 QUEUE=normal # USER_REQUESTED_QUEUE, overrides default JOB_QUEUE
-WALLTIME="01:00:00" # USER_REQUESTED_WALLTIME, overrides default JOB_WALLCLOCK_TIME
+WALLTIME="03:00:00" # USER_REQUESTED_WALLTIME, overrides default JOB_WALLCLOCK_TIME
 PROJ=$(basename "$(dirname "${PROJECT}")") # extract project name (sm61/s1207)
 NTASKS=2 # will be nr of NODES (was 24)
 let "NCORES = $NTASKS * 12" # this will be nr of CPUS
@@ -88,7 +88,9 @@ if [ $DRIVER == nuopc ]; then
     #export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${NETCDF_LIB_PATH}
 
     # hard codedlibary path to NETCDF libraries on daint
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/project/s1207/ivanderk/spack-install/cray-cnl7-haswell/gcc-9.3.0/netcdf-c-4.9.0-tlmjuoss2bcmoyfnk3ycwzlfroeroom5/lib/:/project/s1207/ivanderk/spack-install/cray-cnl7-haswell/gcc-9.3.0/netcdf-fortran-4.6.0-yixrbitaoluai7ra737ei4wtb7rgaxwk/lib/
+
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(spack location -i netcdf-c@4.9.0)/lib/:$(spack location -i netcdf-fortran@4.6.1)/lib/
+
 
     print_log "*** LD_LIBRARY_PATH: ${LD_LIBRARY_PATH} ***"
 
@@ -114,8 +116,8 @@ print_log "\n*** Modifying env_*.xml  ***"
 cd $CASEDIR
 
 # Set directory structure
-#./xmlchange RUNDIR="$CASEDIR/run" # by defaut, RUNDIR is $SCRATCH/$CASENAME/run
-#./xmlchange EXEROOT="$CASEDIR/bld"
+./xmlchange RUNDIR="$CASEDIR/run" # by defaut, RUNDIR is $SCRATCH/$CASENAME/run
+./xmlchange EXEROOT="$CASEDIR/bld"
 
 # Change job settings (env_batch.xml or env_workflow.xml). Do this here to change for both case.run and case.st_archive
 ./xmlchange JOB_QUEUE=$QUEUE --force
@@ -149,22 +151,22 @@ fi
 
 # Domain and mapping files for limited spatial extent
 if [ $DOMAIN == eur ]; then
-    ./xmlchange LND_DOMAIN_PATH="$CESMDATAROOT/CCLM2_EUR_inputdata/domain"
+    ./xmlchange LND_DOMAIN_PATH="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/domain"
     ./xmlchange LND_DOMAIN_FILE="domain_EU-CORDEX_0.5_lon360.nc"
 fi
 
 if [ $DOMAIN == sa ]; then
-    ./xmlchange LND_DOMAIN_PATH="$CESMDATAROOT/CCLM2_SA_inputdata/domain"
+    ./xmlchange LND_DOMAIN_PATH="$CESMDATAROOT/cesm_inputdata/CCLM2_SA_inputdata/domain"
     ./xmlchange LND_DOMAIN_FILE="domain.lnd.360x720_SA-CORDEX_cruncep.100429.nc"
 fi
 
 if [ $DOMAIN == eur ] || [ $DOMAIN == sa ]; then
-    ./xmlchange LND2ROF_FMAPNAME="$CESMDATAROOT/CCLM2_EUR_inputdata/mapping/map_360x720_nomask_to_0.5x0.5_nomask_aave_da_c130103.nc"
-    ./xmlchange ROF2LND_FMAPNAME="$CESMDATAROOT/CCLM2_EUR_inputdata/mapping/map_0.5x0.5_nomask_to_360x720_nomask_aave_da_c120830.nc"
-    ./xmlchange LND2GLC_FMAPNAME="$CESMDATAROOT/CCLM2_EUR_inputdata/mapping/map_360x720_TO_gland4km_aave.170429.nc"
-    ./xmlchange LND2GLC_SMAPNAME="$CESMDATAROOT/CCLM2_EUR_inputdata/mapping/map_360x720_TO_gland4km_aave.170429.nc"
-    ./xmlchange GLC2LND_FMAPNAME="$CESMDATAROOT/CCLM2_EUR_inputdata/mapping/map_gland4km_TO_360x720_aave.170429.nc"
-    ./xmlchange GLC2LND_SMAPNAME="$CESMDATAROOT/CCLM2_EUR_inputdata/mapping/map_gland4km_TO_360x720_aave.170429.nc"
+    ./xmlchange LND2ROF_FMAPNAME="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/mapping/map_360x720_nomask_to_0.5x0.5_nomask_aave_da_c130103.nc"
+    ./xmlchange ROF2LND_FMAPNAME="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/mapping/map_0.5x0.5_nomask_to_360x720_nomask_aave_da_c120830.nc"
+    ./xmlchange LND2GLC_FMAPNAME="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/mapping/map_360x720_TO_gland4km_aave.170429.nc"
+    ./xmlchange LND2GLC_SMAPNAME="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/mapping/map_360x720_TO_gland4km_aave.170429.nc"
+    ./xmlchange GLC2LND_FMAPNAME="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/mapping/map_gland4km_TO_360x720_aave.170429.nc"
+    ./xmlchange GLC2LND_SMAPNAME="$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/mapping/map_gland4km_TO_360x720_aave.170429.nc"
     ./xmlchange MOSART_MODE=NULL # turn off MOSART for the moment because it runs globally
 fi
 
@@ -196,28 +198,28 @@ print_log "\n*** Modifying user_nl_*.xml  ***"
 
 if [ $DOMAIN == eur ]; then
 cat >> user_nl_clm << EOF
-fsurdat = "$CESMDATAROOT/CCLM2_EUR_inputdata/surfdata/surfdata_0.5x0.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190418.nc"
-paramfile = "$CESMDATAROOT/CCLM2_EUR_inputdata/CLM5params/clm5_params.cpbiomass.c190103.nc"
+fsurdat = "$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/surfdata/surfdata_0.5x0.5_hist_16pfts_Irrig_CMIP6_simyr2000_c190418.nc"
+paramfile = "$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/CLM5params/clm5_params.cpbiomass.c190103.nc"
 EOF
 cat >> user_nl_datm << EOF
-domainfile = "$CESMDATAROOT/CCLM2_EUR_inputdata/domain/domain_EU-CORDEX_0.5_lon360.nc"
+domainfile = "$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/domain/domain_EU-CORDEX_0.5_lon360.nc"
 EOF
 fi
 
 if [ $DOMAIN == sa ]; then
 cat >> user_nl_clm << EOF
-fsurdat = "$CESMDATAROOT/CCLM2_SA_inputdata/surfdata/surfdata_360x720cru_SA-CORDEX_16pfts_Irrig_CMIP6_simyr2000_c170824.nc"
-paramfile = "$CESMDATAROOT/CCLM2_EUR_inputdata/CLM5params/clm5_params.cpbiomass.c190103.nc"
+fsurdat = "$CESMDATAROOT/cesm_inputdata/CCLM2_SA_inputdata/surfdata/surfdata_360x720cru_SA-CORDEX_16pfts_Irrig_CMIP6_simyr2000_c170824.nc"
+paramfile = "$CESMDATAROOT/cesm_inputdata/CCLM2_EUR_inputdata/CLM5params/clm5_params.cpbiomass.c190103.nc"
 EOF
 cat >> user_nl_datm << EOF
-domainfile = "$CESMDATAROOT/CCLM2_SA_inputdata/domain/domain.lnd.360x720_SA-CORDEX_cruncep.100429.nc"
+domainfile = "$CESMDATAROOT/cesm_inputdata/CCLM2_SA_inputdata/domain/domain.lnd.360x720_SA-CORDEX_cruncep.100429.nc"
 EOF
 fi
 
 # For global domain keep the defaults (downloaded from svn trunc)
 if [ $DOMAIN == glob ]; then
 cat >> user_nl_clm << EOF
-fsurdat = "$CESMDATAROOT/CTSM_hcru_inputdata/surfdata_360x720cru_16pfts_Irrig_CMIP6_simyr2000_c170824.nc"
+fsurdat = "$CESMDATAROOT/cesm_inputdata/CTSM_hcru_inputdata/surfdata_360x720cru_16pfts_Irrig_CMIP6_simyr2000_c170824.nc"
 EOF
 fi
 
@@ -229,11 +231,6 @@ fi
 print_log "\n*** Building case ***"
 ./case.build --clean-all | tee -a $logfile
 
-if [ $CODE == clm5.0_features ]; then
-    ./case.build --skip-provenance-check | tee -a $logfile # needed with Ronny's old code base
-else
-    ./case.build | tee -a $logfile
-fi
 
 print_log "\n*** Finished building new case in ${CASEDIR} ***"
 
