@@ -50,7 +50,8 @@ export CESMDATAROOT=$SCRATCH/CCLM2_inputdata # inputdata directory on scratch (t
 #export CESMOUTPUTROOT=$SCRATCH/archive/$CASENAME # output directory on scratch
 
 # Log output (use "tee" to send output to both screen and $outfile)
-logfile=$CASEDIR/${CASENAME}_mylogfile.log
+logfile=$SCRATCH/CCLM2_logs/${CASENAME}_mylogfile.log
+mkdir -p "$(dirname "$logfile")" && touch "$logfile" # create parent/child directories and logfile
 print_log() {
     output="$1"
     echo -e "${output}" | tee -a $logfile
@@ -107,6 +108,7 @@ cd $CLMROOT/cime/scripts
 ./create_newcase --case $CASEDIR --compset $COMPSET --res $RES --mach $MACH --compiler $COMPILER --driver $DRIVER --project $PROJ --run-unsupported | tee -a $logfile
 
 
+mv $SCRATCH/${CASENAME}_mylogfile.log $CASEDIR/${CASENAME}_mylogfile.log
 #==========================================
 # Configure CLM
 # Settings will appear in namelists and have precedence over user_nl_xxx
