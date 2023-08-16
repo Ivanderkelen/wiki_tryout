@@ -230,6 +230,7 @@ fi
 
 print_log "\n*** Building case ***"
 ./case.build --clean-all | tee -a $logfile
+./case.build | tee -a $logfile
 
 
 print_log "\n*** Finished building new case in ${CASEDIR} ***"
