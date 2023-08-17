@@ -64,7 +64,7 @@ print_log "*** Logfile at: ${logfile} ***"
 # Sync inputdata on scratch because scratch will be cleaned every month (change inputfiles on $PROJECT!)
 print_log "\n*** Syncing inputdata on scratch  ***"
 #rsync -av /project/$PROJ/shared/CCLM2_inputdata/ $CESMDATAROOT/ | tee -a $logfile # also check for updates in file content
-sbatch --account=$PROJ --export=ALL,PROJ=$PROJ transfer_clm_inputdata.sh # xfer job to prevent overflowing the loginnode
+sbatch --account=$PROJ --export=ALL,PROJ=$PROJ transfer_cesm_inputdata.sh # xfer job to prevent overflowing the loginnode
 
 
 #==========================================
