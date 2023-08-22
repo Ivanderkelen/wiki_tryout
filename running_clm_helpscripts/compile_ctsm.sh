@@ -36,7 +36,7 @@ MACH=pizdaint
 QUEUE=normal # USER_REQUESTED_QUEUE, overrides default JOB_QUEUE
 WALLTIME="03:00:00" # USER_REQUESTED_WALLTIME, overrides default JOB_WALLCLOCK_TIME
 PROJ=$(basename "$(dirname "${PROJECT}")") # extract project name (sm61/s1207)
-NTASKS=2 # will be nr of NODES (was 24)
+NTASKS=24444 # will be nr of NODES (was 24)
 let "NCORES = $NTASKS * 12" # this will be nr of CPUS
 
 NSUBMIT=0 # partition into smaller chunks, excludes the first submission
