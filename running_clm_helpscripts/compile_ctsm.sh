@@ -89,6 +89,7 @@ if [ $DRIVER == nuopc ]; then
     #export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${NETCDF_LIB_PATH}
 
     # hard codedlibary path to NETCDF libraries on daint
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(spack location -i netcdf-c)/lib/:$(spack location -i netcdf-fortran)/lib/
 
     # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(spack location -i netcdf-c@4.9.0)/lib/:$(spack location -i netcdf-fortran@4.6.1)/lib/
 
