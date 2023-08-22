@@ -90,7 +90,7 @@ if [ $DRIVER == nuopc ]; then
 
     # hard codedlibary path to NETCDF libraries on daint
 
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(spack location -i netcdf-c@4.9.0)/lib/:$(spack location -i netcdf-fortran@4.6.1)/lib/
+    # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(spack location -i netcdf-c@4.9.0)/lib/:$(spack location -i netcdf-fortran@4.6.1)/lib/
 
 
     print_log "*** LD_LIBRARY_PATH: ${LD_LIBRARY_PATH} ***"
@@ -108,7 +108,7 @@ cd $CLMROOT/cime/scripts
 ./create_newcase --case $CASEDIR --compset $COMPSET --res $RES --mach $MACH --compiler $COMPILER --driver $DRIVER --project $PROJ --run-unsupported | tee -a $logfile
 
 
-mv $SCRATCH/${CASENAME}_mylogfile.log $CASEDIR/${CASENAME}_mylogfile.log
+
 #==========================================
 # Configure CLM
 # Settings will appear in namelists and have precedence over user_nl_xxx
