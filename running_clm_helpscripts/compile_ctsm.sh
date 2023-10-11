@@ -134,7 +134,7 @@ cd $CASEDIR
 ./xmlchange STOP_OPTION=nyears,STOP_N=$NYEARS
 ./xmlchange NCPL_BASE_PERIOD="day",ATM_NCPL=48 # coupling freq default 30min = day,48
 
-if [ $CODE == CTSMdev ] && [ $DRIVER == nuopc ]; then
+if [ $DRIVER == nuopc ]; then
     ./xmlchange DATM_YR_START=2004,DATM_YR_END=2004,DATM_YR_ALIGN=2004 # new variable names in CTSMdev with nuopc driver
 else
     ./xmlchange DATM_CLMNCEP_YR_START=2004,DATM_CLMNCEP_YR_END=2004,DATM_CLMNCEP_YR_ALIGN=2004 # in clm5.0 and CLM_features, with any driver
