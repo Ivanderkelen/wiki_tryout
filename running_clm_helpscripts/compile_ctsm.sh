@@ -40,7 +40,9 @@ NTASKS=24 # will be nr of NODES (was 24)
 let "NCORES = $NTASKS * 12" # this will be nr of CPUS
 
 NSUBMIT=0 # partition into smaller chunks, excludes the first submission
-STARTDATE="2004-01-01"
+STARTYEAR=2004
+ENDYEAR=2004
+STARTDATE=$STARTYEAR"-01-01"
 NYEARS=1
 
 # Set directories
@@ -73,6 +75,10 @@ sbatch --account=$PROJ --export=ALL,PROJ=$PROJ transfer_cesm_inputdata.sh # xfer
 
 # Find spack_esmf installation  (used in .cime/config_machines.xml and env_build.xml) and path of netcdf files
 if [ $DRIVER == nuopc ]; then
+
+    # make sure to have activated spack environment in order to use spack commands below
+    source ~/spack/share/spack/setup-env.sh
+
     print_log "\n *** Finding spack_esmf ***"
     export ESMF_PATH=$(spack location -i esmf@8.4.1) # e.g. /project/s1207/ivanderk/spack-install/cray-cnl7-haswell/gcc-9.3.0/esmf-8.4.1-esftqomee2sllfsmjevw3f7cet6tbeb4/
     print_log "ESMF at: ${ESMF_PATH}"
@@ -135,7 +141,7 @@ cd $CASEDIR
 ./xmlchange NCPL_BASE_PERIOD="day",ATM_NCPL=48 # coupling freq default 30min = day,48
 
 if [ $DRIVER == nuopc ]; then
-    ./xmlchange DATM_YR_START=2004,DATM_YR_END=2004,DATM_YR_ALIGN=2004 # new variable names in CTSMdev with nuopc driver
+    ./xmlchange DATM_YR_START=$STARTYEAR,DATM_YR_END=$ENDYEAR,DATM_YR_ALIGN=$STARTYEAR # new variable names in CTSMdev with nuopc driver
 else
     ./xmlchange DATM_CLMNCEP_YR_START=2004,DATM_CLMNCEP_YR_END=2004,DATM_CLMNCEP_YR_ALIGN=2004 # in clm5.0 and CLM_features, with any driver
 fi
