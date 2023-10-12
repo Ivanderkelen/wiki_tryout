@@ -41,7 +41,7 @@ let "NCORES = $NTASKS * 12" # this will be nr of CPUS
 
 NSUBMIT=0 # partition into smaller chunks, excludes the first submission
 STARTYEAR=2004
-ENDYEAR=2004
+ENDYEAR=2005 # this can maximally be 2014 (the default GSWP3 forcing data only extends until there) 
 STARTDATE=$STARTYEAR"-01-01"
 NYEARS=1
 
